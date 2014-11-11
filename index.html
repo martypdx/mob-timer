@@ -1,0 +1,59 @@
+<html>
+	<style>
+		main {
+			text-align: center;
+			margin-top: 100px;
+			font-size: 36pt;
+			font-family: sans-serif;
+			cursor: pointer;
+		}
+	</style>
+
+<body>
+	<main></main>
+	<script src='http://cdn.ractivejs.org/latest/ractive.js'></script>
+	<script id='clock' type='text/html'>
+		<span on-click='toggle("run")'>{{ pad(minutes) }}:{{pad(seconds)}}</span>
+	</script>
+
+	<script>
+		var tick = 1000
+		var ractive = new Ractive({
+			el: 'main',
+			template: '#clock',
+			data: {
+				interval: 15 * 60,
+				pad: function ( num ) {
+			      return ( num < 10 ? '0' + num : num );
+			    },
+			    run: true
+			},
+			computed: {
+				minutes: 'Math.floor(${remaining}/60)',
+				seconds: '${remaining} % 60'
+			},
+			start: function(){
+				this.reset()
+				this.set('remaining', this.get('interval'))
+				this.ticker = setInterval(function(){
+					if(this.get('run')){
+						this.subtract('remaining')
+					}
+				}.bind(this), tick)
+			},
+			reset: function(){
+				this.ticker && clearInterval(this.ticker)
+			},
+			oninit: function(){
+				this.observe('remaining', function(n){
+					if(!n || n < 0) {
+						alert('hey')
+						this.start()
+					}
+				}, { defer: true })
+			}
+		})
+	</script>
+
+</body>
+</html>
