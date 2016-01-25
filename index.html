@@ -40,15 +40,17 @@
 	</script>
 
 	<script>
+		var minutesPer = 20;
+		
 		function pad ( num ) {
 	      return ( num < 10 ? '0' + num : num );
 	    }
-		var tick = 1000
+		var tick = 1000;
 		var ractive = new Ractive({
 			el: 'main',
 			template: '#clock',
 			data: {
-				interval: 20 * 60,
+				interval: minutesPer * 60,
 			    run: true,
 			    times: []
 			},
