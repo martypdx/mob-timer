@@ -36,16 +36,17 @@
 				<li style='{{#if t >= 3}}background: red;{{/if}}'>
 			{{/each}}
 		</ul>
-
 	</script>
 
 	<script>
+		
 		var minutesPer = 20;
+		var tick = 1000;
 		
 		function pad ( num ) {
-	      return ( num < 10 ? '0' + num : num );
+	    	return ( num < 10 ? '0' + num : num );
 	    }
-		var tick = 1000;
+		
 		var ractive = new Ractive({
 			el: 'main',
 			template: '#clock',
@@ -56,36 +57,38 @@
 			},
 			computed: {
 				display: function () {
-					return pad(this.get('minutes')) + ':' + pad(this.get('seconds'))
+					return pad( this.get( 'minutes') ) + ':' + pad( this.get( 'seconds' ) );
 				},
 				seconds: '${remaining} % 60',
 				minutes: 'Math.floor( ${remaining}/60 )'
 			},
-			start: function(){
-				// this.set( 'remaining': this.get( 'times' ) + 1 } );
+			start: function () {
 				this.set( 'start', new Date() );
 				this.push( 'times', this.get( 'times.length' ) + 1 );
-				var interval = this.get('interval');
-				this.ticker = setInterval(function(){
-					if(this.get('run')){
+				
+				var interval = this.get( 'interval' );
+				
+				this.ticker = setInterval( function () {
+					if( this.get('run') ) {
 						var elapsed = Math.floor( ( new Date() - this.get( 'start' ) ) / 1000 );
 						this.set( 'remaining', interval - elapsed );
 					}
-				}.bind(this), tick)
+				}.bind(this), tick );
 			},
-			reset: function(){
-				this.ticker && clearInterval(this.ticker)
+			reset: function () {
+				this.ticker && clearInterval( this.ticker )
 			},
-			oninit: function(){
-				this.observe('remaining', function(n){
-					if(!n || n < 0) {
+			oninit: function () {
+				this.observe( 'remaining', function ( n ) {
+					if( !n || n < 0 ) {
 						if ( this.get( 'times.length' ) ) {
 							alert( 'hey' );
 						}
-						this.start()
+						this.start();
 					}
+					// Display remaining time in browser tab
 					document.title = this.get('display');
-				}, { defer: true });
+				}, { defer: true } );
 			}
 		})
 	</script>
