@@ -40,14 +40,11 @@
 
 	<script>
 		
-		var minutesPer = 20;
-		var tick = 1000;
+		const minutesPer = 20;
+		const tick = 1000;
+		const pad = num => num < 10 ? '0' + num : num;
 		
-		function pad ( num ) {
-			return ( num < 10 ? '0' + num : num );
-		}
-		
-		var ractive = new Ractive({
+		new Ractive({
 			el: 'main',
 			template: '#clock',
 			data: {
@@ -56,38 +53,42 @@
 			    times: []
 			},
 			computed: {
-				display: function () {
-					return pad( this.get( 'minutes') ) + ':' + pad( this.get( 'seconds' ) );
-				},
-				seconds: '${remaining} % 60',
-				minutes: 'Math.floor( ${remaining}/60 )'
+				minutes() { return Math.floor( this.get( 'remaining' ) / 60 ); },
+				seconds() { return this.get( 'remaining' ) % 60; },
+				display() {
+					const minutes = pad( this.get( 'minutes') );
+					const seconds = pad( this.get( 'seconds') );
+					return  `${minutes}:${seconds}`;
+				}
 			},
-			start: function () {
+			start() {
 				this.set( 'start', new Date() );
 				this.push( 'times', this.get( 'times.length' ) + 1 );
 				
-				var interval = this.get( 'interval' );
+				const interval = this.get( 'interval' );
 				
-				this.ticker = setInterval( function () {
+				this.ticker = setInterval( () => {
 					if( this.get('run') ) {
-						var elapsed = Math.floor( ( new Date() - this.get( 'start' ) ) / 1000 );
+						const elapsed = Math.floor( ( new Date() - this.get( 'start' ) ) / 1000 );
 						this.set( 'remaining', interval - elapsed );
 					}
-				}.bind(this), tick );
+				}, tick );
 			},
-			reset: function () {
+			reset() {
 				this.ticker && clearInterval( this.ticker )
 			},
-			oninit: function () {
-				this.observe( 'remaining', function ( n ) {
-					if( !n || n < 0 ) {
+			oninit() {
+				this.observe( 'remaining', remaining => {
+					if( !remaining || remaining < 0 ) {
 						if ( this.get( 'times.length' ) ) {
 							alert( 'hey' );
 						}
 						this.start();
 					}
+					
 					// Display remaining time in browser tab
 					document.title = this.get('display');
+					
 				}, { defer: true } );
 			}
 		})
